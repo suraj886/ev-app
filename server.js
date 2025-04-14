@@ -29,54 +29,102 @@ app.get('/', (req, res) => {
 // Get all stations
 app.get('/api/stations', (req, res) => {
   console.log(`Returning ${stationsData.length} stations`);
+  console.log(`HII we are here`);
   res.json(stationsData);
 });
 
 // Get nearby stations (within radius km)
+// app.get('/api/stations/nearby', (req, res) => {
+//   const { latitude, longitude, radius = 50 } = req.query;
+  
+//   console.log(`Nearby search: lat=${latitude}, lon=${longitude}, radius=${radius}km`);
+  
+//   if (!latitude || !longitude) {
+//     return res.status(400).json({ message: 'Latitude and longitude are required' });
+//   }
+  
+//   // Calculate distance using Haversine formula
+//   const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
+//     const R = 6371; // Radius of the earth in km
+//     const dLat = deg2rad(lat2 - lat1);
+//     const dLon = deg2rad(lon2 - lon1);
+//     const a = 
+//       Math.sin(dLat/2) * Math.sin(dLat/2) +
+//       Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+//       Math.sin(dLon/2) * Math.sin(dLon/2); 
+//     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+//     const distance = R * c; // Distance in km
+//     return distance;
+//   };
+
+//   const deg2rad = (deg) => {
+//     return deg * (Math.PI/180);
+//   };
+  
+//   // Filter stations by distance
+//   const nearbyStations = stationsData
+//     .map(station => {
+//       const distance = getDistanceFromLatLonInKm(
+//         parseFloat(latitude), 
+//         parseFloat(longitude), 
+//         station.location.latitude, 
+//         station.location.longitude
+//       );
+//       return { ...station, distance };
+//     })
+//     .filter(station => station.distance <= parseFloat(radius))
+//     .sort((a, b) => a.distance - b.distance);
+  
+//   console.log(`Found ${nearbyStations.length} stations within ${radius}km`);
+//   res.json(nearbyStations);
+// });
+
+// Get nearby stations (within radius km)
 app.get('/api/stations/nearby', (req, res) => {
-  const { latitude, longitude, radius = 50 } = req.query;
-  
-  console.log(`Nearby search: lat=${latitude}, lon=${longitude}, radius=${radius}km`);
-  
-  if (!latitude || !longitude) {
+  const { lat, lng, radius = 50 } = req.query;
+
+  console.log(`Nearby search: lat=${lat}, lon=${lng}, radius=${radius}km`);
+
+  if (!lat || !lng) {
     return res.status(400).json({ message: 'Latitude and longitude are required' });
   }
-  
+
   // Calculate distance using Haversine formula
   const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // Radius of the earth in km
     const dLat = deg2rad(lat2 - lat1);
     const dLon = deg2rad(lon2 - lon1);
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2); 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    const distance = R * c; // Distance in km
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
     return distance;
   };
 
   const deg2rad = (deg) => {
-    return deg * (Math.PI/180);
+    return deg * (Math.PI / 180);
   };
-  
+
   // Filter stations by distance
   const nearbyStations = stationsData
     .map(station => {
       const distance = getDistanceFromLatLonInKm(
-        parseFloat(latitude), 
-        parseFloat(longitude), 
-        station.location.latitude, 
+        parseFloat(lat),
+        parseFloat(lng),
+        station.location.latitude,
         station.location.longitude
       );
       return { ...station, distance };
     })
     .filter(station => station.distance <= parseFloat(radius))
     .sort((a, b) => a.distance - b.distance);
-  
+
   console.log(`Found ${nearbyStations.length} stations within ${radius}km`);
   res.json(nearbyStations);
 });
+
 
 // Get stations by city - IMPORTANT: This needs to come BEFORE the :id route
 app.get('/api/stations/city/:city', (req, res) => {
