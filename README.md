@@ -1,4 +1,4 @@
-# EV Charging Station Backend
+# EV Charging Station Backend Updated
 
 This is a simple backend server for the EV Charging Station App. It serves dummy data for charging stations in Trichy, Gaya, Patna, and Delhi.
 
